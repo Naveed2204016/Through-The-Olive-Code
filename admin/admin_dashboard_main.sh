@@ -5,32 +5,165 @@ echo "========================================"
 echo "          👑 ADMIN DASHBOARD 👑         "
 echo "========================================"
 echo
-echo "1️⃣  Create Contest"
-echo "2️⃣  Review Problems"
-echo "3️⃣  Manage Users"
-echo "4️⃣  Logout"
+echo "1️⃣  Create a New Contest"
+echo "2️⃣  Select Problem Setters"
+echo "3️⃣  Select Problem Set"
+echo "4️⃣  Manage Contestants"
+echo "5️⃣  Manage Problem Setters"
+echo "6️⃣  Cancel a Contest"
 echo
 
 read -p "👉 Choose an option: " choice
 
-case $choice in
-  1)
-    echo "🛠️ Create Contest (coming soon)"
-    ;;
-  2)
-    echo "📋 Review Problems (coming soon)"
-    ;;
-  3)
-    echo "👥 Manage Users (coming soon)"
-    ;;
-  4)
-    echo "👋 Logging out..."
+
+if [ "$choice" = "1" ]; then
+    read -p "📄 Enter contest name: " contest_name
+    read -p "🔢 Enter division :" division
+    read -p "📅 Enter contest date (YYYY-MM-DD): " contest_date
+    read -p "⏰ Enter start time (HH:MM): " contest_start_time
+    read -p "⏰ Enter end time (HH:MM): " contest_end_time
+    echo "$contest_name|$division|${contest_name}_applicants.txt|${contest_name}_ps.txt|${contest_name}_t_problems.txt|${contest_name}_f_problems.txt|$contest_date|$contest_start_time|$contest_end_time" >> database/contest.txt
+    touch "./database/${contest_name}_applicants.txt"
+    touch "./database/${contest_name}_ps.txt"
+    touch "./database/${contest_name}_t_problems.txt"
+    touch "./database/${contest_name}_f_problems.txt"
+    echo "$contest_name" >> ./database/ps_selection_in_progress.txt
+    echo "Calling for Problem Setters..."
     sleep 1
-    ./main.sh
-    ;;
-  *)
-    echo "❌ Invalid option"
-    sleep 1
-    ./admin_dashboard_main.sh
-    ;;
-esac
+    ./admin/admin_dashboard_main.sh
+elif [ "$choice" = "2" ]; then
+    selection_file="./database/ps_selection_in_progress.txt"
+    if [ ! -s "$selection_file" ]; then
+    echo "No contests are currently in selection."
+    exit 0
+    fi
+    echo "📋 Contests in selection:"
+    cat -n "$selection_file"
+    read -p "👉 Enter the number of the contest to select problem setters: " contest_idx
+    contest_name=$(sed -n "${contest_idx}p" "$selection_file" | tr -d '{}' | xargs)
+    
+    if [ -z "$contest_name" ]; then
+    echo "❌ Invalid selection."
+    exit 1
+    fi
+    
+    echo "You selected: $contest_name"
+
+    APPLICANTS_FILE="./database/${contest_name}_applicants.txt"
+    FINAL_SETTERS_FILE="./database/${contest_name}_ps.txt"
+
+    if [ ! -s "$APPLICANTS_FILE" ]; then
+    echo "❌ No applicants found for this contest."
+    exit 1
+    fi
+    
+    # Show applicants
+    echo "📋 Applicants for $contest_name:"
+    cat -n "$APPLICANTS_FILE"
+    echo
+    # Admin selects problem setters
+    echo "Select 2-3 problem setters by entering their numbers separated by space (e.g., 1 3 5):"
+    read -a setter_indices
+    
+    # Clear final setters file
+    > "$FINAL_SETTERS_FILE"
+
+    # Save selected problem setters
+    for idx in "${setter_indices[@]}"; 
+    do
+    setter=$(sed -n "${idx}p" "$APPLICANTS_FILE")
+    if [ -n "$setter" ]; then
+        echo "$setter" >> "$FINAL_SETTERS_FILE"
+    fi
+    done
+    
+    echo "✅ Problem setters finalized for $contest_name:"
+    cat "$FINAL_SETTERS_FILE"
+
+    # will notify selected and rejected problem setters and give them
+    # access to problem setting accordingly (not implemented yet)
+
+    sed -i "${contest_idx}d" ./database/ps_selection_in_progress.txt
+    echo "✅ $contest_name removed from problem_setter_selection_in_progress.txt"
+
+elif [ "$choice" = "3" ]; then
+    echo "Feature coming soon..."
+
+elif [ "$choice" = "4" ]; then
+    echo "Registered Contestants of this platform:"
+    cat -n database/contestant.txt
+    echo
+    echo "Select a contestant to manage by entering their number:"
+    read contestant_idx
+    echo "1️⃣  Remove Contestant"
+    echo "2️⃣  Update Rating"
+    read -p "👉 Choose an option: " manage_choice
+    if [ "$manage_choice" = "1" ]; then
+        sed -i "${contestant_idx}d" ./database/contestant.txt
+        echo "✅ Contestant removed."
+        sleep 1
+    elif [ "$manage_choice" = "2" ]; then
+        contestant=$(sed -n "${contestant_idx}p" database/contestant.txt)
+        read -p "👉 Enter new rating for $contestant: " new_rating
+        updated_contestant=$(echo "$contestant" | awk -F'|' -v OFS='|' '{ $3="'$new_rating'"; print }')
+        sed -i "${contestant_idx}d" ./database/contestant.txt
+        echo "$updated_contestant" >> database/contestant.txt
+        echo "✅ Contestant rating updated."
+    else
+        echo "❌ Invalid option."
+    fi
+    ./admin/admin_dashboard_main.sh
+elif [ "$choice" = "5" ]; then
+    echo "Registered Problem Setters of this platform:"
+    cat -n database/problem_setter.txt
+    echo
+    echo "Select a problem setter to manage by entering their number:"
+    read setter_idx
+    echo "1️⃣  Remove Problem Setter"
+    echo "2️⃣  Update Rating"
+    read -p "👉 Choose an option: " manage_choice
+    if [ "$manage_choice" = "1" ]; then
+        sed -i "${setter_idx}d" ./database/problem_setter.txt
+        echo "✅ Problem Setter removed."
+    elif [ "$manage_choice" = "2" ]; then
+        setter=$(sed -n "${setter_idx}p" database/problem_setter.txt)
+        read -p "👉 Enter new rating for $setter: " new_rating
+        updated_setter=$(echo "$setter" | awk -F'|' -v OFS='|' '{ $3="'$new_rating'"; print }')
+        sed -i "${setter_idx}d" ./database/problem_setter.txt
+        echo "$updated_setter" >> database/problem_setter.txt
+        echo "✅ Problem Setter rating updated."
+    else
+        echo "❌ Invalid option."
+    fi
+    ./admin/admin_dashboard_main.sh
+elif [ "$choice" = "6" ]; then
+    echo "📋 Ongoing Contests:"
+    cat -n database/contest.txt
+    read -p "👉 Enter the number of the contest to cancel: " contest_idx
+    contest_name=$(sed -n "${contest_idx}p" database/contest.txt | cut -d'|' -f1)
+    
+    if [ -z "$contest_name" ]; then
+        echo "❌ Invalid selection."
+        exit 1
+    fi
+    
+    echo "You selected to cancel: $contest_name"
+    
+    # Remove contest from contest.txt
+    sed -i "${contest_idx}d" ./database/contest.txt
+
+    # Remove related files
+    rm -f "./database/${contest_name}_applicants.txt"
+    rm -f "./database/${contest_name}_ps.txt"
+    rm -f "./database/${contest_name}_t_problems.txt"
+    rm -f "./database/${contest_name}_f_problems.txt"
+
+    # Also remove from ps_selection_in_progress if it's there, need to fix it later
+    grep -vxF "$contest_name" database/ps_selection_in_progress.txt > database/ps_selection_in_progress.tmp && mv database/ps_selection_in_progress.tmp database/ps_selection_in_progress.txt
+    
+    echo "✅ $contest_name has been cancelled and all related data has been removed."
+    ./admin/admin_dashboard_main.sh
+else
+    echo "❌ Invalid option. Please try again."
+    ./admin/admin_dashboard_main.sh
+fi
