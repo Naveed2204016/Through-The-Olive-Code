@@ -1,0 +1,2 @@
+Fardin_Distinct_Numbers|800|sorting,searching|4
+Fardin_Movie_Festival|1000|sorting,searching|4

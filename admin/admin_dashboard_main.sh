@@ -28,6 +28,7 @@ if [ "$choice" = "1" ]; then
     touch "./database/${contest_name}_t_problems.txt"
     touch "./database/${contest_name}_f_problems.txt"
     echo "$contest_name" >> ./database/ps_selection_in_progress.txt
+    echo "$contest_name" >> ./database/problem_selection_in_progress.txt
     echo "Calling for Problem Setters..."
     sleep 1
     ./admin/admin_dashboard_main.sh
@@ -87,8 +88,68 @@ elif [ "$choice" = "2" ]; then
     echo "✅ $contest_name removed from problem_setter_selection_in_progress.txt"
 
 elif [ "$choice" = "3" ]; then
-    echo "Feature coming soon..."
+    echo "📋 Contests in problem selection:"
 
+    cat -n ./database/problem_selection_in_progress.txt
+    echo
+    read -p "👉 Enter the number of the contest to select problem set: " contest_idx
+    contest_name=$(sed -n "${contest_idx}p" "./database/problem_selection_in_progress.txt" | tr -d '{}' | xargs)
+    
+    if [ -z "$contest_name" ]; then
+        echo "❌ Invalid selection."
+        exit 1
+    fi
+
+    echo "Submitted problems for $contest_name:"
+    cat -n "./database/${contest_name}_t_problems.txt"
+    echo
+
+    while true; 
+    do
+    echo "1️⃣  View a Problem"
+    echo "2️⃣  Finalize Problem Set"
+    read -p "👉 Choose an option: " problem_selection_choice
+    
+        if [ "$problem_selection_choice" = "1" ]; then
+           read -p "👉 Enter the number of the problem to view: " problem_idx
+           content=$(sed -n "${problem_idx}p" "./database/${contest_name}_t_problems.txt" | tr -d '{}' | xargs)
+           problem_name="${content%%|*}"
+           echo "Problem Statement for $problem_name:"
+           cat "./database/problem_statement/${problem_name}_statement.txt"
+           echo
+           echo "Would you like to view the test cases? (y/n)"
+           read view_cases
+           if [ "$view_cases" = "y" ]; then
+           num_cases=$(echo "$content" | cut -d '|' -f 4)
+           for((i=1;i<=num_cases;i++)); 
+           do
+           echo "Test Case $i :"
+           cat "./database/test_case/${problem_name}_testcase${i}.txt"
+           echo
+           done
+           sleep 6
+           fi
+        elif [ "$problem_selection_choice" = "2" ]; then
+           echo "Select problems by entering their numbers separated by space (e.g., 1 3 5):"
+           read -a problem_indices
+           for idx in "${problem_indices[@]}"; 
+           do
+           problem=$(sed -n "${idx}p" "./database/${contest_name}_t_problems.txt" )
+           echo "$problem" >> "./database/${contest_name}_f_problems.txt"
+           done
+           echo "Problem set finalized for $contest_name"
+           echo
+           cat "./database/${contest_name}_f_problems.txt"
+           sleep 3
+           sed -i "${contest_idx}d" "./database/problem_selection_in_progress.txt"
+           break
+        else
+           echo "❌ Invalid option!"
+           break
+        fi
+    done
+    sleep 1
+    ./admin/admin_dashboard_main.sh
 elif [ "$choice" = "4" ]; then
     echo "Registered Contestants of this platform:"
     cat -n database/contestant.txt
