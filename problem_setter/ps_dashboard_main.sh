@@ -42,7 +42,7 @@ if [ "$ps_choice" = "1" ]; then
         echo "$line" >> "./database/test_case/${username}_${safe_title}_testcase${i}.txt"
         done
     done
-    echo "${username}_${safe_tile}|$problem_difficulty|$tags|$num_cases" >> database/problems.txt
+    echo "${username}_${safe_title}|$problem_difficulty|$tags|$num_cases" >> database/problems.txt
     echo "✅ Problem created successfully!"
     sleep 1
     ./problem_setter/ps_dashboard_main.sh "$username"

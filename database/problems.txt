@@ -1,1 +1,3 @@
 Fardin_Distinct_Numbers|800|sorting,searching|4
+Fardin_Dice_Combinations|900|dp|4
+Fardin_Minimizing_Coins|1000|dp|4
