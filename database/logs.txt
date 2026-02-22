@@ -1,2 +1,3 @@
 Naveed_Fardin_Distinct_Numbers_submission1.cpp | Accepted
 Naveed_Fardin_Dice_Combinations_submission1.cpp | Accepted
+Naveed_Fardin_Dice_Combinations_submission2.cpp | Accepted

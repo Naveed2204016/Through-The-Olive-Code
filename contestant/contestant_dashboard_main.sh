@@ -2057,6 +2057,7 @@ elif [ "$choice" = "2" ]; then
     logs_file="./database/logs.txt"
     temp_file="./database/.user_submissions_tmp.txt"
 
+
     # Extract only this user's submissions and reverse order (latest first)
     grep "^${user_name}_" "$logs_file" | tac > "$temp_file"
 
@@ -2115,6 +2116,8 @@ elif [ "$choice" = "2" ]; then
     read -p "Press ENTER to return to dashboard..."
 
     ./contestant/contestant_dashboard_main.sh
+elif [ "$choice" = "3" ]; then
+    echo "Feature coming soon.."
 elif [ "$choice" = "5" ]; then
     sleep 1
     ./contestant/contestant_dashboard.sh
