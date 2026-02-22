@@ -30,6 +30,9 @@ if [ "$choice" = "1" ]; then
     echo "$contest_name" >> ./database/ps_selection_in_progress.txt
     echo "$contest_name" >> ./database/problem_selection_in_progress.txt
     echo "Calling for Problem Setters..."
+    touch "./database/registration/${contest_name}.txt"
+    touch "./database/contest_submissions/${contest_name}.txt"
+    touch "./database/final_leaderboard/${contest_name}.txt"
     sleep 1
     ./admin/admin_dashboard_main.sh
 elif [ "$choice" = "2" ]; then

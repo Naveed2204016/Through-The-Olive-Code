@@ -180,7 +180,7 @@ sorting_and_searching()
 
 
     # Cleanup user temp directory
-    rm -rf "database/${user_name}"
+    rm -rf "database/${user_name}"    
 }
 
 dp()
@@ -1978,7 +1978,7 @@ combinatorics()
 info=$(grep "^${user_name}|" "./database/contestant.txt")
 rating=$(echo "$info" | awk -F'|' '{print $3}')
 
-echo "Welcome ${user_name}. Your current rating is ${rating}"
+#echo "Welcome ${user_name}. Your current rating is ${rating}"
 echo "========================================"
 echo "      ⚔️ Contestant DASHBOARD  ⚔️      "
 echo "========================================"
@@ -2117,7 +2117,63 @@ elif [ "$choice" = "2" ]; then
 
     ./contestant/contestant_dashboard_main.sh
 elif [ "$choice" = "3" ]; then
-    echo "Feature coming soon.."
+    echo "🚀 Upcoming contests"
+    echo
+
+    file="./database/contest.txt"
+    now=$(date +"%Y-%m-%d %H:%M")
+
+    line_no=0
+
+    while IFS='|' read -r name total app ps tp fp date start end
+    do
+    line_no=$((line_no+1))
+
+    # Combine date and ending time
+    end_datetime="$date $end"
+
+    # Convert both to seconds for comparison
+    end_sec=$(date -d "$end_datetime" +%s 2>/dev/null)
+    now_sec=$(date -d "$now" +%s)
+
+    if [ "$end_sec" -gt "$now_sec" ]; then
+        echo "$line_no) $name"
+    fi
+
+    done < "$file"
+    echo ""
+    read -p "👉 Choose a contest to register: " con
+
+    contest_line=$(sed -n "${con}p" "./database/contest.txt")
+
+    # Check if line exists
+    if [ -z "$contest_line" ]; then
+    echo "❌ Invalid selection."
+    exit 1
+    fi
+
+    # Extract contest name (before first |)
+    contest_name=$(echo "$contest_line" | cut -d'|' -f1)
+
+    contest_file="./database/registration/${contest_name}.txt"
+
+    # Check if contest file exists
+    if [ ! -f "$contest_file" ]; then
+    echo "❌ Contest file not found."
+    exit 1
+    fi
+
+    # Prevent duplicate registration
+    if grep -q "^$user_name$" "$contest_file"; then
+    echo "⚠️ You are already registered in $contest_name."
+    else
+    echo "$user_name" >> "$contest_file"
+    echo "✅ Registration successful for $contest_name!"
+    fi
+    sleep 1
+    ./contestant/contestant_dashboard_main.sh
+elif [ "$choice" = "4" ]; then
+    ./contestant/contest_arena.sh "$user_name"
 elif [ "$choice" = "5" ]; then
     sleep 1
     ./contestant/contestant_dashboard.sh
