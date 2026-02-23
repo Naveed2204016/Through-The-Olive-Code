@@ -1987,7 +1987,8 @@ echo "1️⃣  Solve Topic Wise Problems"
 echo "2️⃣  View Past Submissions"
 echo "3️⃣  Register for a Contest"
 echo "4️⃣  Participate in a Running Contest"
-echo "5️⃣  Exit"
+echo "5️⃣  View leaderboard of past contests"
+echo "6️⃣  Exit"
 echo
 
 read -p "👉 Choose an option: " choice
@@ -2175,6 +2176,174 @@ elif [ "$choice" = "3" ]; then
 elif [ "$choice" = "4" ]; then
     ./contestant/contest_arena.sh "$user_name"
 elif [ "$choice" = "5" ]; then
+    echo ""
+    echo "🏁 Finished Contests:"
+    echo ""
+
+    current_date=$(date +%Y-%m-%d)
+    current_time=$(date +%H:%M)
+
+    finished_contests=()
+    line_numbers=()
+    index=1
+
+    while IFS="|" read -r contest_name contest_id applicants ps t_problems f_problems contest_date start_time end_time
+    do
+        if [[ "$contest_date" < "$current_date" ]] || \
+           [[ "$contest_date" = "$current_date" && "$end_time" < "$current_time" ]]; then
+
+            echo "$index) $contest_name  ($contest_date $start_time-$end_time)"
+            finished_contests+=("$contest_name")
+            line_numbers+=("$index")
+            ((index++))
+        fi
+
+    done < ./database/contest.txt
+
+    if [ ${#finished_contests[@]} -eq 0 ]; then
+        echo "⚠ No finished contests available."
+        read -p "Press Enter to return..."
+        continue
+    fi
+
+    echo ""
+    read -p "Select contest by number: " select_num
+
+    if ! [[ "$select_num" =~ ^[0-9]+$ ]] || \
+       [ "$select_num" -lt 1 ] || \
+       [ "$select_num" -gt ${#finished_contests[@]} ]; then
+        echo "❌ Invalid selection."
+        sleep 1
+        continue
+    fi
+
+    contest_name="${finished_contests[$((select_num-1))]}"
+
+    mkdir -p ./database/final_leaderboard
+    final_file="./database/final_leaderboard/${contest_name}.txt"
+
+    # ============================
+    # If leaderboard already exists
+    # ============================
+
+    if [ -f "$final_file" ] && [ -s "$final_file" ]; then
+        echo ""
+        echo "🏆 Final Leaderboard for $contest_name"
+        echo "---------------------------------------------"
+        cat "$final_file"
+        echo ""
+        read -p "Press Enter to return..."
+        continue
+    fi
+
+    # =====================================
+    # Otherwise compute and store it
+    # =====================================
+
+    echo ""
+    echo "🧮 Computing final leaderboard..."
+
+    contest_file="./database/contest_submissions/${contest_name}.txt"
+
+    if [ ! -f "$contest_file" ]; then
+        echo "⚠ No submissions found."
+        read -p "Press Enter to return..."
+        continue
+    fi
+
+    temp_file="./database/temp_leaderboard.txt"
+    > "$temp_file"
+
+    users=$(cut -d'|' -f1 "$contest_file" | sort -u)
+
+    while IFS="|" read -r cname cid applicants ps tprob fprob cdate cstart cend
+    do
+        if [ "$cname" = "$contest_name" ]; then
+            contest_start="$cstart"
+            break
+        fi
+    done < ./database/contest.txt
+
+    IFS=':' read -r start_h start_m <<< "$contest_start"
+    start_total=$((10#$start_h * 60 + 10#$start_m))
+
+    for user in $users
+    do
+        total_points=0
+        total_time=0
+        solved_list=""
+
+        problems=$(grep "^$user|" "$contest_file" | cut -d'|' -f2 | sort -u)
+
+        for prob in $problems
+        do
+            user_prob_data=$(grep "^$user|$prob|" "$contest_file")
+
+            wrong_count=0
+            accepted_time=""
+            solved=0
+
+            while IFS='|' read -r u p verdict time
+            do
+                if [[ "$verdict" == Accepted* ]]; then
+                    accepted_time="$time"
+                    solved=1
+                    break
+                else
+                    ((wrong_count++))
+                fi
+            done <<< "$user_prob_data"
+
+            if [ $solved -eq 1 ]; then
+
+                IFS=':' read -r acc_h acc_m acc_s <<< "$accepted_time"
+                acc_total=$((10#$acc_h * 60 + 10#$acc_m))
+
+                minutes=$((acc_total - start_total))
+                if [ $minutes -lt 0 ]; then
+                    minutes=0
+                fi
+
+                problem_points=$((1000 - wrong_count*50 - minutes*2))
+                if [ $problem_points -lt 0 ]; then
+                    problem_points=0
+                fi
+
+                total_points=$((total_points + problem_points))
+                total_time=$((total_time + minutes))
+
+                prob_index=$(grep -n "^$prob|" ./database/${contest_name}_f_problems.txt | cut -d':' -f1)
+                solved_list="${solved_list}${prob_index},"
+            fi
+
+        done
+
+        solved_list=${solved_list%,}
+
+        echo "$user|$total_points|$total_time|$solved_list" >> "$temp_file"
+
+    done
+
+    # Write sorted leaderboard permanently
+    printf "%-15s | %-10s | %-20s\n" "USER_NAME" "POINTS" "SOLVED" > "$final_file"
+    echo "--------------------------------------------------------------" >> "$final_file"
+
+    sort -t'|' -k2,2nr -k3,3n "$temp_file" | while IFS='|' read -r u pts t sl
+    do
+        printf "%-15s | %-10s | %-20s\n" "$u" "$pts" "$sl" >> "$final_file"
+    done
+
+    rm -f "$temp_file"
+
+    echo ""
+    echo "🏆 Final Leaderboard for $contest_name"
+    echo "---------------------------------------------"
+    cat "$final_file"
+
+    echo ""
+    read -p "Press Enter to return..."
+    ./contestant/contestant_dashboard_main.sh
+elif [ "$choice" = "6" ]; then
     sleep 1
     ./contestant/contestant_dashboard.sh
 fi

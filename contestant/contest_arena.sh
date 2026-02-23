@@ -45,24 +45,31 @@ judge_submission() {
 
         for ((i=1; i<=num_testcases; i++))
         do
-            testcase_file="database/test_case/${full_name}_testcase${i}.txt"
-            output_file="database/${user_name}/${full_name}_output${i}.txt"
+        echo ""
+        echo "▶ Running test case $i/$num_testcases..."
 
-            if [ ! -f "$testcase_file" ]; then
-                verdict="Judge Error"
-                break
-            fi
+        testcase_file="database/test_case/${full_name}_testcase${i}.txt"
+        output_file="database/${user_name}/${full_name}_output${i}.txt"
 
-            input_data=$(sed '$d' "$testcase_file")
-            expected_output=$(tail -n 1 "$testcase_file" | tr -d '\r')
+        if [ ! -f "$testcase_file" ]; then
+        echo "❌ Testcase file missing!"
+        verdict="Judge Error"
+        break
+        fi
 
-            echo "$input_data" | "$submission_out" > "$output_file"
-            program_output=$(cat "$output_file" | tr -d '\r')
+        input_data=$(sed '$d' "$testcase_file")
+        expected_output=$(tail -n 1 "$testcase_file" | tr -d '\r')
 
-            if [ "$program_output" != "$expected_output" ]; then
-                verdict="Wrong Answer on test case $i"
-                break
-            fi
+        echo "$input_data" | "$submission_out" > "$output_file"
+        program_output=$(cat "$output_file" | tr -d '\r')
+
+        if [ "$program_output" != "$expected_output" ]; then
+        echo "❌ Wrong Answer on test case $i"
+        verdict="Wrong Answer on test case $i"
+        break
+        fi
+
+        echo "✅ Test case $i passed"
         done
     fi
 
