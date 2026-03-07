@@ -2189,21 +2189,23 @@ elif [ "$choice" = "5" ]; then
 
     while IFS="|" read -r contest_name contest_id applicants ps t_problems f_problems contest_date start_time end_time
     do
-        if [[ "$contest_date" < "$current_date" ]] || \
-           [[ "$contest_date" = "$current_date" && "$end_time" < "$current_time" ]]; then
+    # Skip empty or malformed lines
+    [[ -z "$contest_name" || -z "$contest_date" || -z "$start_time" || -z "$end_time" ]] && continue
 
-            echo "$index) $contest_name  ($contest_date $start_time-$end_time)"
-            finished_contests+=("$contest_name")
-            line_numbers+=("$index")
-            ((index++))
-        fi
+    if [[ "$contest_date" < "$current_date" ]] || \
+       [[ "$contest_date" = "$current_date" && "$end_time" < "$current_time" ]]; then
 
+        echo "$index) $contest_name  ($contest_date $start_time-$end_time)"
+        finished_contests+=("$contest_name")
+        line_numbers+=("$index")
+        ((index++))
+    fi
     done < ./database/contest.txt
 
     if [ ${#finished_contests[@]} -eq 0 ]; then
         echo "⚠ No finished contests available."
         read -p "Press Enter to return..."
-        continue
+        ./contestant/contestant_dashboard_main.sh
     fi
 
     echo ""
@@ -2214,7 +2216,7 @@ elif [ "$choice" = "5" ]; then
        [ "$select_num" -gt ${#finished_contests[@]} ]; then
         echo "❌ Invalid selection."
         sleep 1
-        continue
+        ./contestant/contestant_dashboard_main.sh
     fi
 
     contest_name="${finished_contests[$((select_num-1))]}"
@@ -2233,7 +2235,7 @@ elif [ "$choice" = "5" ]; then
         cat "$final_file"
         echo ""
         read -p "Press Enter to return..."
-        continue
+        ./contestant/contestant_dashboard_main.sh
     fi
 
     # =====================================
@@ -2248,7 +2250,7 @@ elif [ "$choice" = "5" ]; then
     if [ ! -f "$contest_file" ]; then
         echo "⚠ No submissions found."
         read -p "Press Enter to return..."
-        continue
+        ./contestant/contestant_dashboard_main.sh
     fi
 
     temp_file="./database/temp_leaderboard.txt"
