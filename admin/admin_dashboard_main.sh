@@ -11,6 +11,7 @@ echo "3️⃣  Select Problem Set"
 echo "4️⃣  Manage Contestants"
 echo "5️⃣  Manage Problem Setters"
 echo "6️⃣  Cancel a Contest"
+echo "7️⃣  Exit"
 echo
 
 read -p "👉 Choose an option: " choice
@@ -89,6 +90,7 @@ elif [ "$choice" = "2" ]; then
 
     sed -i "${contest_idx}d" ./database/ps_selection_in_progress.txt
     echo "✅ $contest_name removed from problem_setter_selection_in_progress.txt"
+    ./admin/admin_dashboard_main.sh
 
 elif [ "$choice" = "3" ]; then
     echo "📋 Contests in problem selection:"
@@ -227,6 +229,9 @@ elif [ "$choice" = "6" ]; then
     
     echo "✅ $contest_name has been cancelled and all related data has been removed."
     ./admin/admin_dashboard_main.sh
+elif [ "$choice" = "7" ]; then
+    echo "👋 Exiting Admin Dashboard..."
+    ./admin/admin_dashboard.sh
 else
     echo "❌ Invalid option. Please try again."
     ./admin/admin_dashboard_main.sh

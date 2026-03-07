@@ -60,6 +60,7 @@ judge_submission() {
         input_data=$(sed '$d' "$testcase_file")
         expected_output=$(tail -n 1 "$testcase_file" | tr -d '\r')
 
+
         echo "$input_data" | "$submission_out" > "$output_file"
         program_output=$(cat "$output_file" | tr -d '\r')
 

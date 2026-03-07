@@ -2172,7 +2172,7 @@ elif [ "$choice" = "3" ]; then
     echo "✅ Registration successful for $contest_name!"
     fi
     sleep 1
-    ./contestant/contestant_dashboard_main.sh
+    ./contestant/contestant_dashboard_main.sh "$user_name"
 elif [ "$choice" = "4" ]; then
     ./contestant/contest_arena.sh "$user_name"
 elif [ "$choice" = "5" ]; then
@@ -2205,7 +2205,7 @@ elif [ "$choice" = "5" ]; then
     if [ ${#finished_contests[@]} -eq 0 ]; then
         echo "⚠ No finished contests available."
         read -p "Press Enter to return..."
-        ./contestant/contestant_dashboard_main.sh
+        ./contestant/contestant_dashboard_main.sh "$user_name"
     fi
 
     echo ""
@@ -2216,7 +2216,7 @@ elif [ "$choice" = "5" ]; then
        [ "$select_num" -gt ${#finished_contests[@]} ]; then
         echo "❌ Invalid selection."
         sleep 1
-        ./contestant/contestant_dashboard_main.sh
+        ./contestant/contestant_dashboard_main.sh "$user_name"
     fi
 
     contest_name="${finished_contests[$((select_num-1))]}"
@@ -2235,7 +2235,7 @@ elif [ "$choice" = "5" ]; then
         cat "$final_file"
         echo ""
         read -p "Press Enter to return..."
-        ./contestant/contestant_dashboard_main.sh
+        ./contestant/contestant_dashboard_main.sh "$user_name"
     fi
 
     # =====================================
@@ -2250,7 +2250,7 @@ elif [ "$choice" = "5" ]; then
     if [ ! -f "$contest_file" ]; then
         echo "⚠ No submissions found."
         read -p "Press Enter to return..."
-        ./contestant/contestant_dashboard_main.sh
+        ./contestant/contestant_dashboard_main.sh "$user_name"
     fi
 
     temp_file="./database/temp_leaderboard.txt"
@@ -2344,7 +2344,7 @@ elif [ "$choice" = "5" ]; then
 
     echo ""
     read -p "Press Enter to return..."
-    ./contestant/contestant_dashboard_main.sh
+    ./contestant/contestant_dashboard_main.sh "$user_name"
 elif [ "$choice" = "6" ]; then
     sleep 1
     ./contestant/contestant_dashboard.sh

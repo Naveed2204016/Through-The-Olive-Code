@@ -1,0 +1,46 @@
+#include<bits/stdc++.h>
+using namespace std;
+using ll=long long;
+int main()
+{
+    int h,w;
+    cin>>h>>w;
+    vector<string> v(h);
+    for(auto &x:v)
+    cin>>x;
+    vector<pair<int,int>> mov={{-1,0},{1,0},{0,1},{0,-1}};
+    vector<vector<bool>> vis(h,vector<bool>(w,false));
+    auto valid=[&](int x,int y)->bool
+    {
+        if(x>=0 && y>=0 && x<h && y<w)
+        return true;
+        else
+        return false;
+    };
+ 
+    auto dfs=[&](int i,int j,auto &&self)->void
+    {
+        vis[i][j]=true;
+        for(auto x:mov)
+        {
+            if(!valid(i+x.first,j+x.second)) continue;
+            if(vis[i+x.first][j+x.second]) continue;
+            if(v[i+x.first][j+x.second]=='.')
+            self(i+x.first,j+x.second,self);
+        }
+    };
+ 
+    ll ans=0;
+    for(int i=0;i<h;i++)
+    {
+        for(int j=0;j<w;j++)
+        {
+            if(!vis[i][j] && v[i][j]=='.')
+            {
+                ans++;
+                dfs(i,j,dfs);
+            }
+        }
+    }
+    cout<<ans<<endl;
+}

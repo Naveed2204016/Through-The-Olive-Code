@@ -2,3 +2,7 @@ Naveed_Fardin_Distinct_Numbers_submission1.cpp | Accepted
 Naveed_Fardin_Dice_Combinations_submission1.cpp | Accepted
 Naveed_Fardin_Dice_Combinations_submission2.cpp | Accepted
 Naveed_Fardin_Distinct_Numbers_submission2.cpp | Accepted
+Naveed_Naveed_Counting_Rooms_submission1.cpp | Wrong Answer on test case 1
+Naveed_Naveed_Counting_Rooms_submission2.cpp | Wrong Answer on test case 1
+Naveed_Naveed_Counting_Rooms_submission3.cpp | Wrong Answer on test case 1
+Naveed_Naveed_Counting_Rooms_submission4.cpp | Accepted
