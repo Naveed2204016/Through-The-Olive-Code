@@ -1,7 +1,7 @@
 #!/bin/bash
 
 clear
-
+./all_execution_permission.sh
 echo "============================================================"
 echo "               🫒 THROUGH THE OLIVE CODE 🫒                 "
 echo "        Terminal-Based Contest Management Platform           "

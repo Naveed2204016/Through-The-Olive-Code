@@ -1,3 +1,6 @@
 *.log
 *.tmp
+*.txt
+*.tex
+*.pdf
 database/*.bak
