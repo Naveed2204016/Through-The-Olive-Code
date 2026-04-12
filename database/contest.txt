@@ -2,3 +2,5 @@ global_round|2|global_round_applicants.txt|global_round_ps.txt|global_round_t_pr
 global_round|2|global_round_applicants.txt|global_round_ps.txt|global_round_t_problems.txt|global_round_f_problems.txt|2026-02-28|18:00|20:00
 Cuet-IUPC|1|Cuet-IUPC_applicants.txt|Cuet-IUPC_ps.txt|Cuet-IUPC_t_problems.txt|Cuet-IUPC_f_problems.txt|2026-02-22|06:00|10:00
 Round1|2|Round1_applicants.txt|Round1_ps.txt|Round1_t_problems.txt|Round1_f_problems.txt|2026-03-07|08:51|09:25
+heddda|2|heddda_applicants.txt|heddda_ps.txt|heddda_t_problems.txt|heddda_f_problems.txt|2026-04-13|01:09|01:15
+GOd contest|2|GOd contest_applicants.txt|GOd contest_ps.txt|GOd contest_t_problems.txt|GOd contest_f_problems.txt|2026-04-13|01:27|01:50

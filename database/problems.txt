@@ -2,3 +2,13 @@ Fardin_Distinct_Numbers|800|sorting,searching|4
 Fardin_Dice_Combinations|900|dp|4
 Fardin_Minimizing_Coins|1000|dp|4
 Naveed_Counting_Rooms|1100|graph|4
+sabrin_tor_nanir_heda|1000|sonna|1
+sabrin_hellow|1000|henda|1
+sabrin_my_name_is_gandy|1200|gg|
+sabrin_Very_hard_problem|12000|fuccc|2
+sabrin_problem1|1300|doable|2
+sabrin_testprob2|3000|greedy|2
+sabrin_Ghost_prob|3500|Num Theory|2
+sabrin_GooGoodolls|2300|gooooooo|3
+sabrin_Fucking_Cool_problem|1900|DP|5
+sabrin_Heddda|1300|Greedy|4
