@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source ./admin/contest_management.sh
+
 clear
 echo "========================================"
 echo "          👑 ADMIN DASHBOARD 👑         "
@@ -10,33 +12,21 @@ echo "2️⃣  Select Problem Setters"
 echo "3️⃣  Select Problem Set"
 echo "4️⃣  Manage Contestants"
 echo "5️⃣  Manage Problem Setters"
-echo "6️⃣  Cancel a Contest"
-echo "7️⃣  Exit"
+echo "6️⃣  Update Contest Time"
+echo "7️⃣  View All Contests"
+echo "8️⃣  Cancel a Contest"
+echo "9️⃣  Exit"
 echo
 
 read -p "👉 Choose an option: " choice
 
 
 if [ "$choice" = "1" ]; then
-    read -p "📄 Enter contest name: " contest_name
-    read -p "🔢 Enter division :" division
-    read -p "📅 Enter contest date (YYYY-MM-DD): " contest_date
-    read -p "⏰ Enter start time (HH:MM): " contest_start_time
-    read -p "⏰ Enter end time (HH:MM): " contest_end_time
-    echo "$contest_name|$division|${contest_name}_applicants.txt|${contest_name}_ps.txt|${contest_name}_t_problems.txt|${contest_name}_f_problems.txt|$contest_date|$contest_start_time|$contest_end_time" >> database/contest.txt
-    touch "./database/${contest_name}_applicants.txt"
-    touch "./database/${contest_name}_ps.txt"
-    touch "./database/${contest_name}_t_problems.txt"
-    touch "./database/${contest_name}_f_problems.txt"
-    echo "$contest_name" >> ./database/ps_selection_in_progress.txt
-    echo "$contest_name" >> ./database/problem_selection_in_progress.txt
-    echo "Calling for Problem Setters..."
-    touch "./database/registration/${contest_name}.txt"
-    touch "./database/contest_submissions/${contest_name}.txt"
-    touch "./database/final_leaderboard/${contest_name}.txt"
-    sleep 1
+    source ./admin/contest_management.sh
+    create_contest
     ./admin/admin_dashboard_main.sh
 elif [ "$choice" = "2" ]; then
+    source ./admin/contest_management.sh
     selection_file="./database/ps_selection_in_progress.txt"
     if [ ! -s "$selection_file" ]; then
     echo "No contests are currently in selection."
@@ -203,6 +193,14 @@ elif [ "$choice" = "5" ]; then
     fi
     ./admin/admin_dashboard_main.sh
 elif [ "$choice" = "6" ]; then
+    source ./admin/contest_management.sh
+    update_contest_time
+    ./admin/admin_dashboard_main.sh
+elif [ "$choice" = "7" ]; then
+    source ./admin/contest_management.sh
+    view_all_contests
+    ./admin/admin_dashboard_main.sh
+elif [ "$choice" = "8" ]; then
     echo "📋 Ongoing Contests:"
     cat -n database/contest.txt
     read -p "👉 Enter the number of the contest to cancel: " contest_idx
@@ -229,7 +227,7 @@ elif [ "$choice" = "6" ]; then
     
     echo "✅ $contest_name has been cancelled and all related data has been removed."
     ./admin/admin_dashboard_main.sh
-elif [ "$choice" = "7" ]; then
+elif [ "$choice" = "9" ]; then
     echo "👋 Exiting Admin Dashboard..."
     ./admin/admin_dashboard.sh
 else

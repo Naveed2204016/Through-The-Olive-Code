@@ -1,6 +1,11 @@
 #!/bin/bash
 
+source ./utils.sh
+
 user_name="$1"
+
+# Support for optional contest name passed directly (for virtual contests or anonymous)
+selected_contest="$2"
 
 
 
@@ -116,83 +121,97 @@ contest_file="./database/contest.txt"
 current_date=$(date +%Y-%m-%d)
 current_time=$(date +%H:%M)
 
-echo ""
-echo "🏟️  Running Contests:"
-echo "----------------------"
+# If no contest was passed, show available contests
+if [ -z "$selected_contest" ]; then
+    echo ""
+    echo "🏟️  Available Contests:"
+    echo "----------------------"
 
-running_contests=()
-line_number=1
+    running_contests=()
+    line_number=1
 
-while IFS="|" read -r contest_name contest_id applicants_file ps_file t_problems f_problems contest_date start_time end_time
-do
-    # Check if contest is today
-    if [ "$contest_date" = "$current_date" ]; then
-        
-        # Check if current time is between start and end
-        if [[ "$current_time" > "$start_time" && "$current_time" < "$end_time" ]] || \
-           [[ "$current_time" = "$start_time" ]] || \
-           [[ "$current_time" = "$end_time" ]]; then
-            
-            echo "$line_number) $contest_name  ($start_time - $end_time)"
+    while IFS="|" read -r contest_name contest_id applicants_file ps_file t_problems f_problems contest_date start_time end_time is_virtual
+    do
+        # For virtual contests - always available
+        if [ "$is_virtual" = "1" ]; then
+            echo "$line_number) 🔵 $contest_name (VIRTUAL)"
             running_contests+=("$contest_name")
             ((line_number++))
+        # For live contests - check date and time
+        elif [ "$contest_date" = "$current_date" ]; then
+            if [[ ("$current_time" > "$start_time" || "$current_time" = "$start_time") && \
+                  ("$current_time" < "$end_time" || "$current_time" = "$end_time") ]]; then
+                echo "$line_number) 🟢 $contest_name (LIVE: $start_time - $end_time)"
+                running_contests+=("$contest_name")
+                ((line_number++))
+            fi
         fi
+
+    done < "$contest_file"
+
+    # No running contests
+    if [ ${#running_contests[@]} -eq 0 ]; then
+        echo ""
+        echo "❌ No contests available right now."
+        read -p "Press Enter to go back..."
+        ./contestant/contestant_dashboard_main.sh "$user_name"
+        exit
     fi
 
-done < "$contest_file"
-
-# No running contests
-if [ ${#running_contests[@]} -eq 0 ]; then
     echo ""
-    echo "❌ No running contests right now."
-    read -p "Press Enter to go back..."
-    ./contestant/contestant_dashboard_main.sh "$user_name"
-    exit
+    read -p "Enter contest line number or write back to go back to main dashboard: " selection
+
+    if [ "$selection" = "back" ]; then
+        ./contestant/contestant_dashboard_main.sh $user_name
+        exit
+    fi
+
+    # Validate numeric input
+    if ! [[ "$selection" =~ ^[0-9]+$ ]]; then
+        echo "❌ Invalid input."
+        sleep 1
+        ./contestant/contest_arena.sh "$user_name"
+        exit
+    fi
+
+    # Validate range
+    if [ "$selection" -lt 1 ] || [ "$selection" -gt ${#running_contests[@]} ]; then
+        echo "❌ Invalid selection."
+        sleep 1
+        ./contestant/contest_arena.sh "$user_name"
+        exit
+    fi
+
+    selected_contest="${running_contests[$((selection-1))]}"
 fi
-
-echo ""
-read -p "Enter contest line number or write back to go back to main dashboard: " selection
-
-if [ "$selection" = "back" ]; then
-    ./contestant/contestant_dashboard_main.sh $user_name
-fi
-
-# Validate numeric input
-if ! [[ "$selection" =~ ^[0-9]+$ ]]; then
-    echo "❌ Invalid input."
-    sleep 1
-    ./contestant/contest_arena.sh "$user_name"
-    exit
-fi
-
-# Validate range
-if [ "$selection" -lt 1 ] || [ "$selection" -gt ${#running_contests[@]} ]; then
-    echo "❌ Invalid selection."
-    sleep 1
-    ./contestant/contest_arena.sh "$user_name"
-    exit
-fi
-
-selected_contest="${running_contests[$((selection-1))]}"
 
 registration_file="./database/registration/${selected_contest}.txt"
 
 # Check registration file exists
 if [ ! -f "$registration_file" ]; then
-    echo "❌ Registration file not found for this contest."
-    sleep 2
-    ./contestant/contest_arena.sh "$user_name"
-    exit
+    mkdir -p "./database/registration"
+    touch "$registration_file"
 fi
 
-# Check if user is registered
-if ! grep -q "^$user_name$" "$registration_file"; then
-    echo ""
-    echo "⚠️  You are not registered for $selected_contest."
-    echo "Please register first."
-    sleep 2
-    ./contestant/contest_arena.sh "$user_name"
-    exit
+# Check if user is registered (or if it's a virtual contest - anyone can join)
+contest_line=$(grep "^$selected_contest|" ./database/contest.txt)
+is_virtual=$(echo "$contest_line" | cut -d'|' -f10)
+
+if [ "$is_virtual" != "1" ]; then
+    # For live contests, check registration
+    if ! grep -q "^$user_name$" "$registration_file"; then
+        echo ""
+        echo "⚠️  You are not registered for $selected_contest."
+        echo "Please register first (Live contests require pre-registration)."
+        sleep 2
+        ./contestant/contest_arena.sh "$user_name"
+        exit
+    fi
+else
+    # For virtual contests, auto-register if not already registered
+    if ! grep -q "^$user_name$" "$registration_file"; then
+        echo "$user_name" >> "$registration_file"
+    fi
 fi
 
 # If registered
@@ -212,6 +231,7 @@ problem_file="./database/${contest_name}_f_problems.txt"
 contest_line=$(grep "^$contest_name|" ./database/contest.txt)
 contest_end_time=$(echo "$contest_line" | cut -d'|' -f9)
 contest_date=$(echo "$contest_line" | cut -d'|' -f7)
+is_virtual=$(echo "$contest_line" | cut -d'|' -f10)
 
 while true
 do
@@ -219,25 +239,30 @@ do
     echo "🏟️  Contest Arena: $contest_name"
     echo "----------------------------------"
 
-    # Calculate remaining time
-    now_epoch=$(date +%s)
-    end_epoch=$(date -d "$contest_date $contest_end_time" +%s 2>/dev/null)
+    # Check if virtual contest
+    if [ "$is_virtual" = "1" ]; then
+        echo "🔵 Virtual Contest - No Time Limit"
+    else
+        # Calculate remaining time for live contests
+        now_epoch=$(date +%s)
+        end_epoch=$(date -d "$contest_date $contest_end_time" +%s 2>/dev/null)
 
-    if [ -n "$end_epoch" ]; then
-        remaining=$((end_epoch - now_epoch))
+        if [ -n "$end_epoch" ]; then
+            remaining=$((end_epoch - now_epoch))
 
-        if [ "$remaining" -le 0 ]; then
-            echo "⏰ Contest has ended."
-            read -p "Press Enter to return..."
-            ./contestant/contest_arena.sh "$user_name"
-            exit
+            if [ "$remaining" -le 0 ]; then
+                echo "⏰ Contest has ended."
+                read -p "Press Enter to return..."
+                ./contestant/contest_arena.sh "$user_name"
+                exit
+            fi
+
+            hours=$((remaining / 3600))
+            minutes=$(((remaining % 3600) / 60))
+            seconds=$((remaining % 60))
+
+            printf "⏳ Remaining Time: %02d:%02d:%02d\n" $hours $minutes $seconds
         fi
-
-        hours=$((remaining / 3600))
-        minutes=$(((remaining % 3600) / 60))
-        seconds=$((remaining % 60))
-
-        printf "⏳ Remaining Time: %02d:%02d:%02d\n" $hours $minutes $seconds
     fi
 
     echo ""
@@ -435,3 +460,6 @@ do
     sleep 1
 
 done
+
+
+#added arena
