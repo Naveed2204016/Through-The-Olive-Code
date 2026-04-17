@@ -6,3 +6,14 @@ Naveed_Naveed_Counting_Rooms_submission1.cpp | Wrong Answer on test case 1
 Naveed_Naveed_Counting_Rooms_submission2.cpp | Wrong Answer on test case 1
 Naveed_Naveed_Counting_Rooms_submission3.cpp | Wrong Answer on test case 1
 Naveed_Naveed_Counting_Rooms_submission4.cpp | Accepted
+Naveed_Fardin_Distinct_Numbers_submission3.cpp | Accepted
+Naveed_Fardin_Distinct_Numbers_submission4.cpp | Accepted
+Naveed_Fardin_Distinct_Numbers_submission5.cpp | Accepted
+Naveed_Fardin_Distinct_Numbers_submission6.cpp | Accepted
+Naveed_Fardin_Distinct_Numbers_submission7.cpp | Accepted
+Naveed_Fardin_Distinct_Numbers_submission8.cpp | Accepted
+Naveed_Fardin_Distinct_Numbers_submission9.cpp | Accepted
+Naveed_Fardin_Distinct_Numbers_submission10.cpp | Accepted
+Naveed_Fardin_Distinct_Numbers_submission11.cpp | Accepted
+Naveed_Fardin_Distinct_Numbers_submission12.cpp | Accepted
+Naveed_Fardin_Distinct_Numbers_submission13.cpp | Accepted

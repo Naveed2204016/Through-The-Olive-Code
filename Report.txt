@@ -1,0 +1,312 @@
+CONTEST MANAGEMENT PLATFORM - ADMIN DASHBOARD FEATURES REPORT
+================================================================
+
+PROJECT: Contest Management Platform
+MODULE: Admin Dashboard (admin_dashboard_main.sh)
+TOTAL FEATURES: 7
+
+================================================================
+
+FEATURE 1: CREATE A NEW CONTEST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+● Function: Admin can create and initialize a new contest for the platform.
+● Process:
+  ○ Admin enters contest details including name, division, date, and time.
+  ○ System prompts for the following information:
+    - Contest Name: Identifier for the contest
+    - Division: Category/level of contest
+    - Contest Date: Format (YYYY-MM-DD)
+    - Start Time: Contest begins at (HH:MM)
+    - End Time: Contest ends at (HH:MM)
+  ○ New entries are added to database/contest.txt with pipe-delimited format.
+  ○ System automatically creates associated database files:
+    - ${contest_name}_applicants.txt (for registered contestants)
+    - ${contest_name}_ps.txt (for selected problem setters)
+    - ${contest_name}_t_problems.txt (for temporary problem submissions)
+    - ${contest_name}_f_problems.txt (for finalized problems)
+  ○ Contest names are automatically added to:
+    - ps_selection_in_progress.txt (awaiting problem setter selection)
+    - problem_selection_in_progress.txt (awaiting problem set finalization)
+  ○ Additional folders created for registration, submissions, and leaderboard.
+  ○ User is redirected back to admin dashboard after creation.
+
+
+FEATURE 2: SELECT PROBLEM SETTERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+● Function: Admin selects 2-3 problem setters from applicants for a contest.
+● Process:
+  ○ System displays list of contests currently in problem setter selection phase.
+  ○ Admin selects a contest by entering its corresponding number.
+  ○ System validates the contest selection and verifies applicants exist.
+  ○ All registered applicants for the contest are displayed with numbered list.
+  ○ Admin selects 2-3 problem setters by entering their numbers separated by spaces (e.g., 1 3 5).
+  ○ Selected problem setters are saved to ${contest_name}_ps.txt file.
+  ○ System displays confirmation with list of finalized problem setters.
+  ○ Contest is automatically removed from ps_selection_in_progress.txt after completion.
+  ○ Notification system prepared for selected/rejected setters (feature planned for future).
+  ○ User is redirected back to admin dashboard.
+
+
+FEATURE 3: SELECT PROBLEM SET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+● Function: Admin reviews and finalizes the problem set for a contest.
+● Process:
+  ○ System displays list of contests in problem selection phase.
+  ○ Admin selects a contest by entering its number.
+  ○ System displays all problems submitted by problem setters (from ${contest_name}_t_problems.txt).
+  ○ Admin has two options in a submenu:
+    
+    SUBMENU OPTION 1 - View a Problem:
+      - Admin selects problem number to preview
+      - System extracts problem name from the temporary problems file
+      - Problem statement is displayed from database/problem_statement/ directory
+      - Admin given option to view associated test cases
+      - If yes, system displays all test cases sequentially (with 6-second pause)
+      - Test cases are retrieved from database/test_case/ directory
+    
+    SUBMENU OPTION 2 - Finalize Problem Set:
+      - Admin selects problems to include by entering numbers separated by spaces
+      - Selected problems are copied from _t_problems.txt to _f_problems.txt (finalized list)
+      - System confirms finalization and displays the finalized problem set
+      - Contest is removed from problem_selection_in_progress.txt
+      - User is redirected back to admin dashboard
+  
+  ○ Process allows careful review before final commitment to problem set.
+
+
+FEATURE 4: MANAGE CONTESTANTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+● Function: Admin can remove contestants or update their ratings from the platform.
+● Process:
+  ○ System displays all registered contestants with numbers from database/contestant.txt.
+  ○ Admin selects a contestant by entering their line number.
+  ○ System presents two management options:
+    
+    OPTION 1 - Remove Contestant:
+      - Contestant entry is deleted from database/contestant.txt
+      - Confirmation message displayed
+      - User redirected back to admin dashboard
+    
+    OPTION 2 - Update Rating:
+      - Admin enters new rating value for the selected contestant
+      - System parses contestant record (pipe-delimited format)
+      - Updates the rating field (third field) with new value
+      - Old entry is removed and updated entry is appended to database/contestant.txt
+      - Confirmation message displayed
+      - User redirected back to admin dashboard
+  
+  ○ This feature maintains contestant database integrity and performance metrics.
+
+
+FEATURE 5: MANAGE PROBLEM SETTERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+● Function: Admin can remove problem setters or update their ratings from the platform.
+● Process:
+  ○ System displays all registered problem setters with numbers from database/problem_setter.txt.
+  ○ Admin selects a problem setter by entering their line number.
+  ○ System presents two management options:
+    
+    OPTION 1 - Remove Problem Setter:
+      - Problem setter entry is deleted from database/problem_setter.txt
+      - Confirmation message displayed
+      - User redirected back to admin dashboard
+    
+    OPTION 2 - Update Rating:
+      - Admin enters new rating value for the selected problem setter
+      - System parses problem setter record (pipe-delimited format)
+      - Updates the rating field (third field) with new value
+      - Old entry is removed and updated entry is appended to database/problem_setter.txt
+      - Confirmation message displayed
+      - User redirected back to admin dashboard
+  
+  ○ This feature allows quality control through removal and performance tracking through ratings.
+
+
+FEATURE 6: CANCEL A CONTEST
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+● Function: Admin can cancel an ongoing contest and remove all associated data.
+● Process:
+  ○ System displays list of all ongoing contests from database/contest.txt.
+  ○ Admin selects contest to cancel by entering its line number.
+  ○ System validates selection and extracts contest name.
+  ○ Confirmation of selected contest displayed to prevent accidental cancellation.
+  ○ System performs complete data removal:
+    - Contest entry removed from database/contest.txt
+    - ${contest_name}_applicants.txt file deleted
+    - ${contest_name}_ps.txt file deleted
+    - ${contest_name}_t_problems.txt file deleted
+    - ${contest_name}_f_problems.txt file deleted
+    - Contest entry removed from ps_selection_in_progress.txt if present
+  ○ Confirmation message confirms successful cancellation.
+  ○ User is redirected back to admin dashboard.
+  ○ WARNING: This operation is permanent and cannot be undone.
+
+
+FEATURE 7: EXIT
+━━━━━━━━━━━━━━
+● Function: Admin safely exit from admin dashboard.
+● Process:
+  ○ Displays farewell message "👋 Exiting Admin Dashboard..."
+  ○ System redirects to intermediate admin menu (admin_dashboard.sh)
+  ○ Allows graceful logout from the admin system.
+
+
+================================================================
+DATABASE FILES STRUCTURE
+================================================================
+
+Core Database Files:
+- database/contest.txt: Stores all contest information (pipe-delimited)
+- database/contestant.txt: Stores all registered contestants (pipe-delimited)
+- database/problem_setter.txt: Stores all registered problem setters (pipe-delimited)
+- database/ps_selection_in_progress.txt: Tracks contests awaiting setter selection
+- database/problem_selection_in_progress.txt: Tracks contests awaiting problem finalization
+
+Contest-Specific Files (created per contest):
+- database/${contest_name}_applicants.txt
+- database/${contest_name}_ps.txt
+- database/${contest_name}_t_problems.txt
+- database/${contest_name}_f_problems.txt
+- database/registration/${contest_name}.txt
+- database/contest_submissions/${contest_name}.txt
+- database/final_leaderboard/${contest_name}.txt
+
+
+DATA FORMAT
+===========
+Contest Entry: contest_name|division|applicants_file|ps_file|temp_problems_file|finalized_problems_file|date|start_time|end_time
+
+Contestant/Problem Setter Entry: username|password|rating
+
+
+================================================================
+
+PROBLEM SETTER DASHBOARD FEATURES REPORT
+=================================================
+
+MODULE: Problem Setter Dashboard (ps_dashboard_main.sh)
+TOTAL FEATURES: 5
+
+================================================================
+
+FEATURE 1: CREATE A NEW PROBLEM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+● Function: Problem setter creates a new problem with statement and test cases.
+● Process:
+  ○ Problem setter enters title, difficulty level, and tags (comma-separated).
+  ○ System prompts for problem statement (multiline input ending with 'END').
+  ○ Setter specifies number of test cases.
+  ○ For each test case, setter enters input and correct answer (ending with 'END').
+  ○ Problem details saved to database/problems.txt (username_title|difficulty|tags|num_cases).
+  ○ Problem statement saved to database/problem_statement/
+  ○ Test cases saved to database/test_case/ directory.
+
+
+FEATURE 2: VIEW YOUR PROBLEMS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+● Function: View all created problems with their details and test cases.
+● Process:
+  ○ System displays all problems created by the logged-in problem setter.
+  ○ Setter selects problem by number to view full problem statement.
+  ○ Option provided to view all associated test cases.
+  ○ System displays each test case sequentially with pause.
+
+
+FEATURE 3: APPLY TO BE A CONTEST SETTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+● Function: Problem setter applies to be a setter for available contests.
+● Process:
+  ○ System displays contests in problem setter selection phase.
+  ○ Setter can apply for multiple contests by entering numbers (space-separated).
+  ○ Username added to ${contest_name}_applicants.txt for each selected contest.
+  ○ Confirmation displayed for each application.
+
+
+FEATURE 4: SUBMIT PROBLEMS FOR A CONTEST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+● Function: Selected setter submits created problems for an assigned contest.
+● Process:
+  ○ System displays available contests for problem submission.
+  ○ Setter selects a contest by number.
+  ○ System verifies setter is selected for the contest by checking ${contest_name}_ps.txt
+  ○ Setter lists all their created problems and selects ones to submit (space-separated).
+  ○ Selected problems copied to ${contest_name}_t_problems.txt file.
+  ○ Confirmation message displays after submission.
+  ○ Error shown if setter not selected for contest.
+
+
+FEATURE 5: EXIT
+━━━━━━━━━━━━━━
+● Function: Problem setter logout from dashboard.
+● Process:
+  ○ Displays goodbye message.
+  ○ Redirects to problem setter menu (ps_dashboard.sh).
+
+
+================================================================
+CONTESTANT DASHBOARD FEATURES REPORT
+====================================
+
+MODULE: Contestant Dashboard (contestant_dashboard_main.sh)
+TOTAL FEATURES: 6
+
+================================================================
+
+FEATURE 1: SOLVE TOPIC WISE PROBLEMS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+● Function: Contestant solves practice problems by topic.
+● Process:
+  ○ Contestant chooses a topic (e.g., Sorting, DP, Graph, Tree).
+  ○ System filters matching problems from database/problems.txt.
+  ○ Contestant views statement, submits .cpp file path, and system compiles it.
+  ○ Solution is judged against test cases and verdict is shown.
+  ○ Submission source is saved and verdict is logged in database/logs.txt.
+
+
+FEATURE 2: VIEW PAST SUBMISSIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+● Function: Contestant checks previous submissions and source code.
+● Process:
+  ○ System lists user submissions from logs (latest first).
+  ○ Contestant selects one submission by number.
+  ○ Linked source file is loaded from database/submissions/ and displayed.
+
+
+FEATURE 3: REGISTER FOR A CONTEST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+● Function: Contestant registers for upcoming contests.
+● Process:
+  ○ System shows contests whose end time is still in the future.
+  ○ Contestant selects contest by number.
+  ○ Username is added to database/registration/<contest>.txt.
+  ○ Duplicate registration is prevented.
+
+
+FEATURE 4: PARTICIPATE IN A RUNNING CONTEST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+● Function: Contestant enters live contest arena.
+● Process:
+  ○ Dashboard redirects to contest_arena.sh with current username.
+  ○ Contest solving and live submission flow is handled there.
+
+
+FEATURE 5: VIEW LEADERBOARD OF PAST CONTESTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+● Function: Contestant views final rankings of finished contests.
+● Process:
+  ○ System lists finished contests based on date and end time.
+  ○ If leaderboard already exists, it is shown directly.
+  ○ Otherwise leaderboard is computed from contest submissions and stored.
+  ○ Rankings are sorted by points (desc) and time (asc), then displayed.
+
+
+FEATURE 6: EXIT
+━━━━━━━━━━━━━━
+● Function: Contestant exits dashboard.
+● Process:
+  ○ System returns to contestant main menu (contestant_dashboard.sh).
+
+
+================================================================
+END OF REPORT
+================================================================

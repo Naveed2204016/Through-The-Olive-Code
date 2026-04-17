@@ -1273,7 +1273,7 @@ mathametics()
         split($3, topics, ",")
         for(i in topics)
         {
-            if(topics[i]=="mathametics")
+            if(topics[i]=="mathametics" || topics[i]=="math")
             {
                 print $0
                 break
@@ -1987,8 +1987,9 @@ echo "1️⃣  Solve Topic Wise Problems"
 echo "2️⃣  View Past Submissions"
 echo "3️⃣  Register for a Contest"
 echo "4️⃣  Participate in a Running Contest"
-echo "5️⃣  View leaderboard of past contests"
-echo "6️⃣  Exit"
+echo "5️⃣  Participate in a Virtual Contest"
+echo "6️⃣  View leaderboard of past contests"
+echo "7️⃣  Exit"
 echo
 
 read -p "👉 Choose an option: " choice
@@ -2045,11 +2046,11 @@ if [ "$choice" = "1" ]; then
     *)
     echo "❌ Invalid option"
     sleep 1
-    ./contestant/contestant_dashboard_main.sh
+    ./contestant/contestant_dashboard_main.sh $user_name
     ;;
     esac
     sleep 2
-    ./contestant/contestant_dashboard_main.sh
+    ./contestant/contestant_dashboard_main.sh $user_name
 elif [ "$choice" = "2" ]; then
     echo ""
     echo "📜 Here are your past submissions:"
@@ -2116,7 +2117,7 @@ elif [ "$choice" = "2" ]; then
     echo ""
     read -p "Press ENTER to return to dashboard..."
 
-    ./contestant/contestant_dashboard_main.sh
+    ./contestant/contestant_dashboard_main.sh "$user_name"
 elif [ "$choice" = "3" ]; then
     echo "🚀 Upcoming contests"
     echo
@@ -2176,6 +2177,8 @@ elif [ "$choice" = "3" ]; then
 elif [ "$choice" = "4" ]; then
     ./contestant/contest_arena.sh "$user_name"
 elif [ "$choice" = "5" ]; then
+    bash ./contestant/virtual_contest_arena.sh "$user_name"
+elif [ "$choice" = "6" ]; then
     echo ""
     echo "🏁 Finished Contests:"
     echo ""
@@ -2345,9 +2348,9 @@ elif [ "$choice" = "5" ]; then
     echo ""
     read -p "Press Enter to return..."
     ./contestant/contestant_dashboard_main.sh "$user_name"
-elif [ "$choice" = "6" ]; then
+elif [ "$choice" = "7" ]; then
     sleep 1
-    ./contestant/contestant_dashboard.sh
+    ./contestant/contestant_dashboard.sh "$user_name"
 fi
 
 

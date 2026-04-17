@@ -2,3 +2,9 @@ Fardin_Distinct_Numbers|800|sorting,searching|4
 Fardin_Dice_Combinations|900|dp|4
 Fardin_Minimizing_Coins|1000|dp|4
 Naveed_Counting_Rooms|1100|graph|4
+Fardin_Missing_Numbers|900|sorting,searching|1
+Fardin_Exponentiation|1000|math|1
+Alif_Hello_world|100|sorting|1
+Fardin_Sorting|100|sort|2
+Fardin_weird_algo|800|sorting|1
+Fardin_problem_demo|299|sorting,|2

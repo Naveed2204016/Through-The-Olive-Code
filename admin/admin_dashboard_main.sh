@@ -21,9 +21,7 @@ if [ "$choice" = "1" ]; then
     read -p "📄 Enter contest name: " contest_name
     read -p "🔢 Enter division :" division
     read -p "📅 Enter contest date (YYYY-MM-DD): " contest_date
-    read -p "⏰ Enter start time (HH:MM): " contest_start_time
-    read -p "⏰ Enter end time (HH:MM): " contest_end_time
-    echo "$contest_name|$division|${contest_name}_applicants.txt|${contest_name}_ps.txt|${contest_name}_t_problems.txt|${contest_name}_f_problems.txt|$contest_date|$contest_start_time|$contest_end_time" >> database/contest.txt
+    echo "$contest_name|$division|${contest_name}_applicants.txt|${contest_name}_ps.txt|${contest_name}_t_problems.txt|${contest_name}_f_problems.txt|$contest_date||" >> database/contest.txt
     touch "./database/${contest_name}_applicants.txt"
     touch "./database/${contest_name}_ps.txt"
     touch "./database/${contest_name}_t_problems.txt"
@@ -49,7 +47,7 @@ elif [ "$choice" = "2" ]; then
     
     if [ -z "$contest_name" ]; then
     echo "❌ Invalid selection."
-    exit 1
+    ./admin/admin_dashboard_main.sh
     fi
     
     echo "You selected: $contest_name"
@@ -59,7 +57,7 @@ elif [ "$choice" = "2" ]; then
 
     if [ ! -s "$APPLICANTS_FILE" ]; then
     echo "❌ No applicants found for this contest."
-    exit 1
+    ./admin/admin_dashboard_main.sh
     fi
     
     # Show applicants
@@ -102,7 +100,7 @@ elif [ "$choice" = "3" ]; then
     
     if [ -z "$contest_name" ]; then
         echo "❌ Invalid selection."
-        exit 1
+        ./admin/admin_dashboard_main.sh
     fi
 
     echo "Submitted problems for $contest_name:"
@@ -143,6 +141,17 @@ elif [ "$choice" = "3" ]; then
            echo "$problem" >> "./database/${contest_name}_f_problems.txt"
            done
            echo "Problem set finalized for $contest_name"
+           read -p "⏰ Enter start time (HH:MM): " contest_start_time
+           read -p "⏰ Enter end time (HH:MM): " contest_end_time
+           updated_contest_file=$(awk -F'|' -v OFS='|' -v name="$contest_name" -v start="$contest_start_time" -v end="$contest_end_time" '
+           {
+               if ($1 == name) {
+                   $8 = start
+                   $9 = end
+               }
+               print
+           }' ./database/contest.txt)
+           printf '%s\n' "$updated_contest_file" > ./database/contest.txt
            echo
            cat "./database/${contest_name}_f_problems.txt"
            sleep 3
@@ -231,6 +240,7 @@ elif [ "$choice" = "6" ]; then
     ./admin/admin_dashboard_main.sh
 elif [ "$choice" = "7" ]; then
     echo "👋 Exiting Admin Dashboard..."
+    sleep 6
     ./admin/admin_dashboard.sh
 else
     echo "❌ Invalid option. Please try again."

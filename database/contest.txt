@@ -2,3 +2,12 @@ global_round|2|global_round_applicants.txt|global_round_ps.txt|global_round_t_pr
 global_round|2|global_round_applicants.txt|global_round_ps.txt|global_round_t_problems.txt|global_round_f_problems.txt|2026-02-28|18:00|20:00
 Cuet-IUPC|1|Cuet-IUPC_applicants.txt|Cuet-IUPC_ps.txt|Cuet-IUPC_t_problems.txt|Cuet-IUPC_f_problems.txt|2026-02-22|06:00|10:00
 Round1|2|Round1_applicants.txt|Round1_ps.txt|Round1_t_problems.txt|Round1_f_problems.txt|2026-03-07|08:51|09:25
+Test_Round|2|Test_Round_applicants.txt|Test_Round_ps.txt|Test_Round_t_problems.txt|Test_Round_f_problems.txt|2026-03-28|12:03|12:06
+Test_Contest1|2|Test_Contest1_applicants.txt|Test_Contest1_ps.txt|Test_Contest1_t_problems.txt|Test_Contest1_f_problems.txt|2026-03-29|01:27|01:30
+Test_Contest2|2|Test_Contest2_applicants.txt|Test_Contest2_ps.txt|Test_Contest2_t_problems.txt|Test_Contest2_f_problems.txt|2026-03-29|01:59|02:05
+Test_4|3|Test_4_applicants.txt|Test_4_ps.txt|Test_4_t_problems.txt|Test_4_f_problems.txt|2026-04-09|12:51|13:44
+Test_5|2|Test_5_applicants.txt|Test_5_ps.txt|Test_5_t_problems.txt|Test_5_f_problems.txt|2026-04-11|10:11|10:15
+Test_6|2|Test_6_applicants.txt|Test_6_ps.txt|Test_6_t_problems.txt|Test_6_f_problems.txt|2026-04-12|00:39|00:45
+Test_7|2|Test_7_applicants.txt|Test_7_ps.txt|Test_7_t_problems.txt|Test_7_f_problems.txt|2026-04-12|01:00|01:15
+c1|2|c1_applicants.txt|c1_ps.txt|c1_t_problems.txt|c1_f_problems.txt|2026-04-12|02:00|02:30
+T1|2|T1_applicants.txt|T1_ps.txt|T1_t_problems.txt|T1_f_problems.txt|2026-04-21|02:20|03:20
